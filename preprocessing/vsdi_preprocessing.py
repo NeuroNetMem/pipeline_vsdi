@@ -334,22 +334,18 @@ def pca(vsdi, raw_mask=None, n_comp=10, normalize=True):
     return fingerprints, timecourses
 
 
-def pca_ica(vsdi, raw_mask, n_comp=50, ica_max_iter=200):
+def pca_ica(vsdi, raw_mask, n_comp=10,z_score = True, ica_max_iter=200):
     # reshape vsdi data to (time, pixels)
     X = vsdi.transpose(2, 0, 1)
-    # store original shape
-    # vsdi_shape = vsdi.shape
-    if raw_mask is not None:
-        # put out-of-mask values to zero
-        X = X[:, raw_mask]
-    else:
-        # flatten 2d pixels to array
-        X = X.reshape(vsdi.shape[0], vsdi.shape[1]*vsdi.shape[2])
+    X = X*raw_mask
+    X = X.reshape(X.shape[0], X.shape[1]*X.shape[2])
+    
+    if z_score:
+        X = StandardScaler().fit_transform(X)
+    
 
     # Create a pipeline with PCA and ICA
-    pipe = Pipeline([
-        ('scaler', StandardScaler()),
-        ('pca', PCA(n_components=n_comp)),
+    pipe = Pipeline([('pca', PCA(n_components=n_comp)),
         ('ica', FastICA(n_components=n_comp, max_iter=ica_max_iter,
                         random_state=1, whiten='unit-variance'))
     ])
@@ -358,7 +354,7 @@ def pca_ica(vsdi, raw_mask, n_comp=50, ica_max_iter=200):
     fingerprints = out.named_steps["ica"].components_ @ out.named_steps["pca"].components_
     timecourses = fingerprints @ X.T
 
-    return fingerprints, timecourses
+    return fingerprints.reshape(n_comp,raw_mask.shape[0],raw_mask.shape[1]), timecourses
 
 
 def glm(Y, X):
