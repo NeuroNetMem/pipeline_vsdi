@@ -334,7 +334,7 @@ def pca(vsdi, raw_mask=None, n_comp=10, normalize=True):
     return fingerprints, timecourses
 
 
-def pca_ica(vsdi, raw_mask, n_comp=10,z_score = True, ica_max_iter=200):
+def pca_ica(vsdi, raw_mask, n_comp=10,z_score = True,ica_random_state=42,ica_max_iter=200):
     # reshape vsdi data to (time, pixels)
     X = vsdi.transpose(2, 0, 1)
     X = X*raw_mask
@@ -347,7 +347,7 @@ def pca_ica(vsdi, raw_mask, n_comp=10,z_score = True, ica_max_iter=200):
     # Create a pipeline with PCA and ICA
     pipe = Pipeline([('pca', PCA(n_components=n_comp)),
         ('ica', FastICA(n_components=n_comp, max_iter=ica_max_iter,
-                        random_state=1, whiten='unit-variance'))
+                        random_state=ica_random_state, whiten='unit-variance'))
     ])
 
     out = pipe.fit(X)
