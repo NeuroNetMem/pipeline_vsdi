@@ -264,17 +264,16 @@ def clean_outliers(vsdi, nsigma=6):
     return vsdi
 
 
-def design_matrix(b_data):
+def make_design_matrix(b_data,fps=50):
     # Design matrix
     # Returns a matrix of size (time, 6) with the following columns:
     # 0: CS+ (2s)
     # 1: CS+ trace (1s)
-    # 2: CS- (2s)
-    # 3: CS- trace (1s)
+    # 2: sound (CS+ or CS-) (2s)
+    # 3: sound trace (1s)
     # 4: Reward (1s)
     # 5: Lick
 
-    fps = 50
 
     Lick = b_data['Lick']
     CSp = b_data['CSp']
@@ -304,6 +303,11 @@ def design_matrix(b_data):
         X[frame:frame + (fps * 2), 2] = 1
         frame += (fps * 2) + 1
         X[frame:frame + (fps * 1), 3] = 1
+        
+    # make sound and sound trace
+    X[:,2] = X[:,2]+X[:,0] # sound = Cs+ + CS-
+    X[:,3] = X[:,3]+X[:,1]
+    
 
     return X
 
