@@ -2,8 +2,6 @@
 <img src="https://images.squarespace-cdn.com/content/v1/6172d4d5e7f28f6b50179b1b/c3b7cc24-51a1-44aa-8b39-b5e94ac01e8d/image+%282%29.png">
 </h1><br>
 
-
-# pipeline_vsdi
 Preprocessing tools for voltage sensitive dye imaging data
 
 ## Structure
