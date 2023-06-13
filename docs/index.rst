@@ -9,8 +9,9 @@ VSDI Pipeline
 Preprocessing tools for voltage sensitive dye imaging data
 
 .. toctree::
-   :maxdepth: 2
-   :caption: Contents:
+   :maxdepth: 1
 
-   modules
-
+   pipeline_vsdi.preprocessing 
+   pipeline_vsdi.dim_reduction 
+   pipeline_vsdi.visualization 
+   pipeline_vsdi.vsdi

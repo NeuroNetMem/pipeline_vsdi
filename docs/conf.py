@@ -8,7 +8,7 @@
 
 import os
 import sys
-sys.path.insert(0, os.path.abspath("../pipeline_vsdi"))
+sys.path.insert(0, os.path.abspath('../pipeline_vsdi'))
 
 project = 'VSDI Pipeline'
 copyright = '2023, NeuroNetMem'
@@ -18,9 +18,10 @@ release = '0.1.0'
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
-extensions = ["sphinx.ext.todo", 
-              "sphinx.ext.viewcode", 
-              "sphinx.ext.autodoc"]
+extensions = ['sphinx.ext.autodoc',
+              'numpydoc',
+              'sphinx.ext.autosummary',
+              'sphinx_design']
 
 templates_path = ['_templates']
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
@@ -30,6 +31,19 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
-html_theme = 'sphinx_rtd_theme'
+# html_theme = 'sphinx_rtd_theme'
+html_theme = 'pydata_sphinx_theme'
+html_favicon = '_static/favicon/favicon.ico'
+html_logo = '_static/favicon/favicon.ico'
+html_context = {"default_mode": "light"}
 html_show_sourcelink = False
 html_static_path = ['_static']
+
+# -----------------------------------------------------------------------------
+# Autosummary
+# -----------------------------------------------------------------------------
+
+
+# Make numpydoc to generate plots for example sections
+numpydoc_use_plots = True
+autosummary_generate = True

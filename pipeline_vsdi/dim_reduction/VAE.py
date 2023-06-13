@@ -7,70 +7,7 @@ from torch.utils.data import DataLoader, TensorDataset
 from tqdm import tqdm
 from sklearn.linear_model import LinearRegression
 from random import shuffle
-
-class Conv_VAE(nn.Module):
-    def __init__(self, latent_dim):
-        super(Conv_VAE, self).__init__()
-        self.latent_dim = latent_dim
-
-        # Encoder
-        self.encoder = nn.Sequential(
-            nn.Conv2d(1, 16, kernel_size=3, stride=1, padding=1),
-            nn.ReLU(),
-            nn.Conv2d(16, 32, kernel_size=3, stride=1, padding=1),
-            nn.ReLU(),
-            nn.Conv2d(32, 64, kernel_size=3, stride=1, padding=1),
-            nn.ReLU()
-        )
-        
-        # Linear layer for mean and variance
-        self.fc_mu = nn.Linear(64 * 84 * 48, self.latent_dim)
-        self.fc_logvar = nn.Linear(64 * 84 * 48, self.latent_dim)
-
-        # Decoder
-        self.decoder = nn.Sequential(
-            nn.Linear(self.latent_dim, 64 * 84 * 48),
-            nn.ReLU(),
-            nn.Unflatten(1, (64, 84, 48)),
-            nn.ConvTranspose2d(64, 32, kernel_size=3, stride=1, padding=1),
-            nn.ReLU(),
-            nn.ConvTranspose2d(32, 16, kernel_size=3, stride=1, padding=1),
-            nn.ReLU(),
-            nn.ConvTranspose2d(16, 1, kernel_size=3, stride=1, padding=1),
-            nn.Sigmoid()
-        )
-        
-    def reparametrize(self, mu, logvar):
-        std = torch.exp(0.5 * logvar)
-        eps = torch.randn_like(std)
-        return mu + eps * std
-
-    def forward(self, x):
-        # Encoder
-        encoded = self.encoder(x)
-        encoded = torch.flatten(encoded, start_dim=1)
-
-        # Reparameterization
-        mu = self.fc_mu(encoded)
-        logvar = self.fc_logvar(encoded)
-        z = self.reparametrize(mu, logvar)
-
-        # Decoder
-        reconstructed = self.decoder(z)
-
-        return reconstructed, mu, logvar
-
-    def backward(self, optimizer, criterion, x, y_true):
-        optimizer.zero_grad()
-        y_pred, mu, logvar = self.forward(x)
-        kl_div = -0.5 * torch.sum(1 + logvar - mu.pow(2) - logvar.exp())
-        mse = criterion(y_pred, y_true)
-        loss = mse + kl_div
-        loss.backward()
-        optimizer.step()
-        return loss.item()
-    
-    
+  
 class Conv_AE(nn.Module):
     def __init__(self, latent_dim):
         super(Conv_AE, self).__init__()
@@ -123,6 +60,7 @@ class Conv_AE(nn.Module):
         loss.backward()
         optimizer.step()
         return loss.item()
+
 
 def create_dataloader(dataset, batch_size=128, reshuffle_after_epoch=True):
     '''
@@ -246,6 +184,7 @@ def find_max_activation_images(model, n_hidden, img_shape=[1, 84, 49]):
 
     return np.array(images)
 
+
 def shuffle_2D_matrix(m):
     '''
     Shuffles a matrix across both axis (not only the first axis like numpy.permutation() or random.shuffle()).
@@ -264,6 +203,7 @@ def shuffle_2D_matrix(m):
     ind_y = (ind_shuffled%m.shape[1]).astype(np.int_)
     m_shuffled = m[ind_x, ind_y]
     return m_shuffled
+
 
 def linear_decoding_score(embeddings, features, n_baseline=10000):
     '''

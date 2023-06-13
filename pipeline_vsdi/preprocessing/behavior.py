@@ -1,4 +1,36 @@
-# Data management
+"""
+This module provides a set of functions for the analysis of animal behavioral data.
+
+Functions:
+---------
+make_design_matrix(b_data, event_sequences, fps=50):
+    Generates a design matrix based on the provided event sequences.
+
+subsets(Set):
+    Finds the starting indices of subsets of consecutive numbers within the provided set.
+
+get_trials(feature):
+    Finds the starting indices of trials within the provided design matrix vector.
+
+compute_lick_rate(data, trial_onsets, fps):
+    Compute the lick rate for each trial.
+
+store_indices(animals, days, sessions, outpath):
+    Store cumulative index (based on X matrix length) for each session, day, and animal,
+    as well as trial indices for CS+ and CS- trials in a nested dictionary structure.
+
+Example
+----------
+This module can be used to compute lick rates and extract trial indices from behavioral data
+for multiple animals over multiple days and sessions.
+
+>>> animals = ['Mouse1', 'Mouse2']
+>>> days = ['Day1', 'Day2']
+>>> sessions = ['Session1', 'Session2']
+>>> outpath = '/path/to/output/directory'
+>>> indices_dict = store_indices(animals, days, sessions, outpath)
+"""
+
 import numpy as np
 
 def make_design_matrix(b_data, event_sequences, fps=50):
@@ -133,7 +165,38 @@ def get_trials(feature):
     return feature_trials
 
 def compute_lick_rate(data, trial_onsets, fps):
+    """
+    Compute the lick rate for each trial.
 
+    For each trial, the function computes the number of licks during a 'baseline' period 
+    of 1 second before CS presentation and during a 'trace' period of 1 second starting 
+    2 seconds after CS presentation. The lick rate for the trial is then computed as 
+    the number of licks in the trace period minus the number of licks in the baseline period.
+
+    Parameters
+    ----------
+    data : ndarray
+        1D numpy array containing lick data. Each element corresponds to a frame, and its 
+        value indicates whether a lick occurred in that frame (1) or not (0).
+        
+    trial_onsets : ndarray
+        1D numpy array containing the onset times (in frames) of each trial.
+        
+    fps : int
+        Frame rate of the data (frames per second).
+        
+    Returns
+    -------
+    lick_rates : list
+        List of lick rates for each trial.
+
+    Examples
+    --------
+    >>> lick_data = np.random.randint(0, 2, 600)  # Mock lick data
+    >>> trial_onsets = np.array([100, 300, 500])  # Mock trial onset times
+    >>> fps = 30  # Frame rate
+    >>> lick_rates = compute_lick_rate(lick_data, trial_onsets, fps)
+    """
     lick_rates = []
     
     for i in range(len(trial_onsets)):
@@ -149,14 +212,6 @@ def compute_lick_rate(data, trial_onsets, fps):
         lick_rates.append(lick_rate)
     
     return lick_rates
-
-def compute_and_add_lick_rate(df, fps):
-    """
-    Lick Rate (Hz) per frame using X dataframe version
-    """
-    # Group by 'Animal', 'Day', 'Session' and apply rolling window calculation
-    df['Lick Rate (Hz)'] = df.groupby(['Animal', 'Day', 'Session'])['Lick'].transform(lambda x: x.rolling(fps, min_periods=1).sum())
-    return df
 
 def store_indices(animals, days, sessions, outpath):
     """
