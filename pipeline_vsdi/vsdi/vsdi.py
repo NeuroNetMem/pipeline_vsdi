@@ -54,7 +54,7 @@ class DataLoader:
         """Exit method for the DataLoader context manager."""
         self.file.close()
 
-    def load_data(self, datapath, animals, days, sessions):
+    def load_data(self, datapath, animals, days, sessions, event_sequences):
         """
         Load VSI data into the HDF5 file.
 
