@@ -679,24 +679,20 @@ test = ["asv", "gmpy2", "mpmath", "pooch", "pytest", "pytest-cov", "pytest-timeo
 
 [[package]]
 name = "seaborn"
-version = "0.12.2"
-description = "Statistical data visualization"
+version = "0.11.2"
+description = "seaborn: statistical data visualization"
 optional = false
-python-versions = ">=3.7"
+python-versions = ">=3.6"
 files = [
-    {file = "seaborn-0.12.2-py3-none-any.whl", hash = "sha256:ebf15355a4dba46037dfd65b7350f014ceb1f13c05e814eda2c9f5fd731afc08"},
-    {file = "seaborn-0.12.2.tar.gz", hash = "sha256:374645f36509d0dcab895cba5b47daf0586f77bfe3b36c97c607db7da5be0139"},
+    {file = "seaborn-0.11.2-py3-none-any.whl", hash = "sha256:85a6baa9b55f81a0623abddc4a26b334653ff4c6b18c418361de19dbba0ef283"},
+    {file = "seaborn-0.11.2.tar.gz", hash = "sha256:cf45e9286d40826864be0e3c066f98536982baf701a7caa386511792d61ff4f6"},
 ]
 
 [package.dependencies]
-matplotlib = ">=3.1,<3.6.1 || >3.6.1"
-numpy = ">=1.17,<1.24.0 || >1.24.0"
-pandas = ">=0.25"
-
-[package.extras]
-dev = ["flake8", "flit", "mypy", "pandas-stubs", "pre-commit", "pytest", "pytest-cov", "pytest-xdist"]
-docs = ["ipykernel", "nbconvert", "numpydoc", "pydata_sphinx_theme (==0.10.0rc2)", "pyyaml", "sphinx-copybutton", "sphinx-design", "sphinx-issues"]
-stats = ["scipy (>=1.3)", "statsmodels (>=0.10)"]
+matplotlib = ">=2.2"
+numpy = ">=1.15"
+pandas = ">=0.23"
+scipy = ">=1.0"
 
 [[package]]
 name = "six"
@@ -708,6 +704,24 @@ files = [
     {file = "six-1.16.0-py2.py3-none-any.whl", hash = "sha256:8abb2f1d86890a2dfb989f9a77cfcfd3e47c2a354b01111771326f8aa26e0254"},
     {file = "six-1.16.0.tar.gz", hash = "sha256:1e61c37477a1626458e36f7b1d82aa5c9b094fa4802892072e49de9c60c4c926"},
 ]
+
+[[package]]
+name = "statannotations"
+version = "0.5.0"
+description = "add statistical significance or custom annotations on seaborn plots. Based on statannot 0.2.3"
+optional = false
+python-versions = ">=3.6"
+files = [
+    {file = "statannotations-0.5.0-py3-none-any.whl", hash = "sha256:fbcec5666e0eab9eca41e5337e60ee4dce552d0dda2e70c05f73e41498c62b46"},
+    {file = "statannotations-0.5.0.tar.gz", hash = "sha256:15449b8c9835c4f4e582aef7698eb2994fe75ced5df0882115f355cc0fe181fb"},
+]
+
+[package.dependencies]
+matplotlib = ">=2.2.2"
+numpy = ">=1.12.1"
+pandas = ">=0.23.0"
+scipy = ">=1.1.0"
+seaborn = ">=0.9.0,<0.12"
 
 [[package]]
 name = "statsmodels"
@@ -814,4 +828,4 @@ testing = ["big-O", "flake8 (<5)", "jaraco.functools", "jaraco.itertools", "more
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.9,<3.13"
-content-hash = "5cab8c96a151d4615b0d7160bb7314a0a2134b8295497936f483a15c0411ab91"
+content-hash = "05b78c0065513fa477a5ed37887a51c81ad8587f44c21e6b959967f5ca03d07a"
