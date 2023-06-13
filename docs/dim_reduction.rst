@@ -1,8 +1,5 @@
-dim\_reduction package
-======================
-
-Submodules
-----------
+Dimensionality Reduction
+========================
 
 dim\_reduction.VAE module
 -------------------------
@@ -12,10 +9,3 @@ dim\_reduction.VAE module
    :undoc-members:
    :show-inheritance:
 
-Module contents
----------------
-
-.. automodule:: dim_reduction
-   :members:
-   :undoc-members:
-   :show-inheritance:

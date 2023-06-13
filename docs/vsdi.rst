@@ -1,16 +1,5 @@
-vsdi package
-============
-
-Submodules
-----------
-
-vsdi.loaders module
--------------------
-
-.. automodule:: vsdi.loaders
-   :members:
-   :undoc-members:
-   :show-inheritance:
+Data Handling
+=============
 
 vsdi.vsdi module
 ----------------
@@ -20,10 +9,11 @@ vsdi.vsdi module
    :undoc-members:
    :show-inheritance:
 
-Module contents
----------------
+vsdi.loaders module
+-------------------
 
-.. automodule:: vsdi
+.. automodule:: vsdi.loaders
    :members:
    :undoc-members:
    :show-inheritance:
+

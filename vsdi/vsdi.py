@@ -1,4 +1,22 @@
-from pathlib import Path
+"""
+This module provides a `DataLoader` class for handling VSDI (Voltage-Sensitive Dye Imaging) data stored in HDF5 files.
+
+Dependencies
+------------
+- numpy
+- scipy
+- h5py
+- loaders (imported but not defined within this file)
+- pipeline_vsdi.preprocessing.utils (imported but not defined within this file)
+
+Usage
+-----
+1. Create a `DataLoader` instance by providing the path to the HDF5 file and the directory containing the VSI data files.
+2. Use the `load_data` method to load VSI data into the HDF5 file.
+3. Use the `clean_vsdi` method to clean VSDI data by removing outliers.
+4. Use the `get_data` method to retrieve data from the HDF5 file.
+"""
+
 from scipy.io import loadmat
 import h5py
 
@@ -13,13 +31,10 @@ class DataLoader:
     ----------
     filepath : str
         Path to the HDF5 file to be loaded.
-    datapath : str
-        Path to the directory containing the VSI data files.
     """
-    def __init__(self, filepath, datapath):
+    def __init__(self, filepath):
         """Initialize the DataLoader."""
         self.filepath = filepath
-        self.datapath = Path(datapath)
 
     def __enter__(self):
         """
@@ -34,21 +49,10 @@ class DataLoader:
         return self
 
     def __exit__(self, type, value, traceback):
-        """
-        Exit method for the DataLoader context manager.
-
-        Parameters
-        ----------
-        type : type
-            The type of the exception, if an exception occurred.
-        value : exception or None
-            The exception that occurred, if any.
-        traceback : traceback or None
-            The traceback object associated with the exception, if any.
-        """
+        """Exit method for the DataLoader context manager."""
         self.file.close()
 
-    def load_data(self, animals, days, sessions):
+    def load_data(self, datapath, animals, days, sessions):
         """
         Load VSI data into the HDF5 file.
 
@@ -60,11 +64,7 @@ class DataLoader:
             List of day names.
         sessions : list
             List of session names.
-        """
-        total_animals = len(animals)
-        total_days = len(days)
-        total_sessions = len(sessions)
-        
+        """     
         for animal in animals:
             animal_group = self.file.require_group(animal)
 
@@ -72,7 +72,7 @@ class DataLoader:
                 day_group = animal_group.require_group(day)
 
                 # Load mask file for each day
-                mask = loadmat(self.datapath.joinpath(f'{animal}/{day}/vsdi_mask.mat'))['mask']
+                mask = loadmat(datapath.joinpath(f'{animal}/{day}/vsdi_mask.mat'))['mask']
                 if 'mask' in day_group:
                     del day_group['mask']
                 day_group.create_dataset('mask', data=mask)
@@ -81,7 +81,7 @@ class DataLoader:
                     session_group = day_group.require_group(session)
 
                     # Load matlab behavioural file
-                    atc = loadmat(self.datapath.joinpath(f'{animal}/{day}/{session}.mat'))
+                    atc = loadmat(datapath.joinpath(f'{animal}/{day}/{session}.mat'))
 
                     # Extract dictionary
                     b_data = loaders.extract_behavioural_data(atc)
@@ -93,7 +93,7 @@ class DataLoader:
                     session_group.create_dataset('behavioral', data=X_matrix)
 
                     # Load VSDI
-                    vsdi = loadmat(self.datapath.joinpath(f'{animal}/{day}/vsdi_{session}.mat'))['vsdi_data']
+                    vsdi = loadmat(datapath.joinpath(f'{animal}/{day}/vsdi_{session}.mat'))['vsdi_data']
 
                     if 'vsdi' in session_group:
                         del session_group['vsdi']

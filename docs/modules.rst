@@ -1,5 +1,5 @@
-pipeline_vsdi
-=============
+Pipeline Modules
+================
 
 .. toctree::
    :maxdepth: 4

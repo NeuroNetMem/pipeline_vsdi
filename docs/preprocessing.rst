@@ -1,8 +1,5 @@
-preprocessing package
-=====================
-
-Submodules
-----------
+Preprocessing Tools
+===================
 
 preprocessing.clustering module
 -------------------------------
@@ -24,14 +21,6 @@ preprocessing.vsdi\_preprocessing module
 ----------------------------------------
 
 .. automodule:: preprocessing.vsdi_preprocessing
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-Module contents
----------------
-
-.. automodule:: preprocessing
    :members:
    :undoc-members:
    :show-inheritance:

@@ -6,14 +6,11 @@
 VSDI Pipeline
 =========================================
 
+Preprocessing tools for voltage sensitive dye imaging data
+
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
 
    modules
 
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`

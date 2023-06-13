@@ -1,8 +1,5 @@
-visualization package
-=====================
-
-Submodules
-----------
+Visualization Tools
+===================
 
 visualization.vsdi\_visualization module
 ----------------------------------------
