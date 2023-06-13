@@ -25,7 +25,6 @@ def peak_distance(component, smooth_window_size, hist_nbins):
 
     return x_max
 
-
 def check_bimodal(components, th=1.0, smooth_window_size=5, hist_nbins=1000):
     """
     Test for bimodality using moving average to smooth the histogram
