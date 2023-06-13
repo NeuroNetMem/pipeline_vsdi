@@ -20,7 +20,7 @@ Usage
 from scipy.io import loadmat
 import h5py
 import loaders
-from pipeline_vsdi.preprocessing.utils import make_design_matrix, normalize_vsdi, clean_outliers
+from pipeline_vsdi.preprocessing.behavior import make_design_matrix
 
 # from loaders import *
 # from pipeline_vsdi.preprocessing.utils import *
