@@ -7,16 +7,6 @@ Preprocessing tools for voltage sensitive dye imaging data
 
 ## Structure
 
-- vsdi will contain classes for handling sessions and full datasets
-- preprocessing contains functionality to clean and reshape data
-- dim_reduction contains functionality to reduce the dimensionality of the data with different models
-
-# Pipeline VSDI
-
-This repository provides preprocessing tools for Voltage Sensitive Dye Imaging (VSDI) data. The project structure includes modules for handling sessions, full datasets, preprocessing of data, and dimensionality reduction.
-
-## Structure
-
 - **vsdi** - Contains classes for handling sessions and full datasets.
 - **preprocessing** - Contains functionality to clean and reshape data.
 - **dim_reduction** - Contains functionality to reduce the dimensionality of the data with different models.
