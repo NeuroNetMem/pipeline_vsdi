@@ -8,7 +8,6 @@ from sklearn.pipeline import Pipeline
 import scipy.stats as stats
 import statsmodels.api as sm
 
-
 ##########################################################
 
 def peak_distance(component, smooth_window_size, hist_nbins):

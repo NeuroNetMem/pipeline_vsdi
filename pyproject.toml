@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "vsdi pipeline"
+version = "1.0.0"
+description = "Preprocessing tools for voltage sensitive dye imaging data"
+authors = ["NeuroNetMem"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+scikit-learn = "^1.2.2"
+numpy = "^1.24.3"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

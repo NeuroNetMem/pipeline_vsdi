@@ -1,164 +1,200 @@
-##########################################################
-######################## PACKAGES ########################
-##########################################################
-import matplotlib.pyplot as plt
-import numpy as np
-from scipy import stats
-from scipy.stats import norm
-from sklearn.decomposition import PCA
-import seaborn as sns
-sns.set_theme(context='notebook',
-              style='white',
-              font_scale=1.5,
-              rc = {'axes.spines.top':False,'axes.spines.right':False,
-                    'image.cmap':plt.cm.jet})
+from pathlib import Path
+from scipy.io import loadmat
+import h5py
 
-##########################################################
-####################### VSDI CLASS #######################
-##########################################################
+# from loaders import *
+# from pipeline_vsdi.preprocessing.utils import *
 
-class VSDI:
-    def __init__(self, vsdi, raw_mask):
-        """
-        Constructor for VSDI class
-        """
-        self.vsdi = self.correct_outliers(vsdi)
-        self.raw_mask = raw_mask
-        self.X = self.vsdi.transpose(2,0,1)    # reshape in time x image format
-        self.T,self.h,self.w = self.X.shape    # saves time, height and width for future use
-        self.X = self.X[:,self.raw_mask]       # select only cortex pixels, returns a flattened image
+class DataLoader:
+    """
+    Handling VSDI data full dataset using HDF5 files
 
-    def time_course(self, start_time=0, end_time=600, framerate=50):
-        """
-        Plot time course of a single PC
-        """
-        plt.figure(figsize=(10, 5))
-        t = np.linspace(start_time, end_time, int((end_time - start_time) * framerate - 1))
-        plt.plot(t, self.vsdi)
-        plt.xlabel('Time (s)')
-        plt.ylabel('PC activation (a.u.)')
-        plt.show()
+    Parameters
+    ----------
+    filepath : str
+        Path to the HDF5 file to be loaded.
+    datapath : str
+        Path to the directory containing the VSI data files.
+    """
+    def __init__(self, filepath, datapath):
+        """Initialize the DataLoader."""
+        self.filepath = filepath
+        self.datapath = Path(datapath)
 
-    def create_frame(self, t):
+    def __enter__(self):
         """
-        Create a frame of the VSDI data
-        """
-        plt.figure(figsize=(10, 10))
-        plt.imshow(self.vsdi[:, :, t], cmap=plt.cm.inferno)
+        Enter method for the DataLoader context manager.
 
-    def pca(self, n_components=50):
+        Returns
+        -------
+        self : DataLoader
+            The DataLoader instance.
         """
-        Perform PCA on the VSDI data
-        """
-        pca = PCA(n_components=n_components)
-        pca.fit(self.X)
+        self.file = h5py.File(self.filepath, 'a')
+        return self
 
-        return pca
-    
-    def pca_projection(self, pca, num_pc):
+    def __exit__(self, type, value, traceback):
         """
-        Plot the projection of the data onto the first 10 PCs
-        """
-        PCs = pca.components_[:num_pc].T
-        Y = self.X @ PCs # compute the PC timecourse, by projecting the original data on each component
-        return Y
+        Exit method for the DataLoader context manager.
 
-    def cumulative_explained_variance(self, pca):
+        Parameters
+        ----------
+        type : type
+            The type of the exception, if an exception occurred.
+        value : exception or None
+            The exception that occurred, if any.
+        traceback : traceback or None
+            The traceback object associated with the exception, if any.
         """
-        Plot cumulative explained variance
-        """
-        evr = pca.explained_variance_ratio_
-        c_evr = np.cumsum(evr)
-        plt.figure(figsize=(6, 6))
-        plt.axhline(0.9, linestyle='--', label='90% explained variance')
-        plt.plot(range(1, len(c_evr) + 1), c_evr)
-        plt.legend()
-        plt.xlabel('# of components')
-        plt.ylabel('EVR')
+        self.file.close()
 
-    def fingerprint(self, pca, num_pc = 10):
+    def load_data(self, animals, days, sessions):
         """
-        Plot topographic organzation of the weights of these ten components
-        """
-        PCs = pca.components_[:num_pc]
-        plt.figure(figsize=(10, 5))
-        for i, pc in enumerate(PCs):
-            plt.subplot(2, 5, i + 1)
-            plt.title(f'PC {i + 1}')
-            reshaped_pc = np.full((self.h, self.w), np.nan)
-            reshaped_pc[np.where(self.raw_mask)] = pc
-            plt.imshow(reshaped_pc, aspect='auto', cmap=plt.cm.jet)
-            plt.axis('off')
+        Load VSI data into the HDF5 file.
 
-    def first_last_subsets(self, arr):
+        Parameters
+        ----------
+        animals : list
+            List of animal names.
+        days : list
+            List of day names.
+        sessions : list
+            List of session names.
         """
-        Get first and last frame of each subset
-        """
-        subsets = []
-        start = 0
-        end = 0
-        while end < len(arr):
-            while end + 1 < len(arr) and arr[end + 1] - arr[start] == end - start + 1:
-                end += 1
-            subsets.append((arr[start], arr[end]))
-            start = end = end + 1
-        return np.array(subsets)
-
-    def correct_outliers(self, vsdi, nsigma=4):
-        """
-        Correct outliers in VSDI data
-        """
-        # Array with average value of all frames in vsdi
-        mean_vsdi = np.mean(vsdi, axis=(0,1))
-        std_vsdi = vsdi.std()
-
-        # Get index of outliers from vsdi presenting average activity higher than 4 sigma
-        outliers = np.argwhere((mean_vsdi > nsigma*std_vsdi) | (mean_vsdi < -nsigma*std_vsdi)).ravel()
+        total_animals = len(animals)
+        total_days = len(days)
+        total_sessions = len(sessions)
         
-        # Get first and last frame of each subset
-        outliers_subsets = self.first_last_subsets(arr = outliers)
+        for animal in animals:
+            animal_group = self.file.require_group(animal)
 
-        # Set outlier frames to the mean between the previous and next frame
-        for i in range(len(outliers_subsets)):
-            start = outliers_subsets[i][0]
-            end = outliers_subsets[i][1]
-            if start == 0:
-                vsdi[:,:,start:end+1] = np.tile(vsdi[:,:,end+1][:, :, np.newaxis], (1, 1, end - start + 1))
-            elif end == len(mean_vsdi)-1:
-                vsdi[:,:,start:end+1] = np.tile(vsdi[:,:,start-1][:, :, np.newaxis], (1, 1, end - start + 1))
+            for day in days:
+                day_group = animal_group.require_group(day)
+
+                # Load mask file for each day
+                mask = loadmat(self.datapath.joinpath(f'{animal}/{day}/vsdi_mask.mat'))['mask']
+                if 'mask' in day_group:
+                    del day_group['mask']
+                day_group.create_dataset('mask', data=mask)
+
+                for session in sessions:
+                    session_group = day_group.require_group(session)
+
+                    # Load matlab behavioural file
+                    atc = loadmat(self.datapath.joinpath(f'{animal}/{day}/{session}.mat'))
+
+                    # Extract dictionary
+                    b_data = loaders.extract_behavioural_data(atc)
+                    # Create ndarray design matrix
+                    X_matrix = make_design_matrix(b_data, event_sequences)
+
+                    if 'behavioral' in session_group:
+                        del session_group['behavioral']
+                    session_group.create_dataset('behavioral', data=X_matrix)
+
+                    # Load VSDI
+                    vsdi = loadmat(self.datapath.joinpath(f'{animal}/{day}/vsdi_{session}.mat'))['vsdi_data']
+
+                    if 'vsdi' in session_group:
+                        del session_group['vsdi']
+                    session_group.create_dataset('vsdi', data=vsdi)
+                    
+                    # Extract LFP data
+                    lfp = loaders.extract_lfp_data(atc)
+
+                    if 'lfp' in session_group:
+                        del session_group['lfp']
+                    session_group.create_dataset('lfp', data=lfp)
+
+    def clean_vsdi(self, animal=None, day=None, session=None, nsigma=3):
+        """
+        Clean VSDI data by removing outliers.
+
+        Parameters
+        ----------
+        animal : str, optional
+            Animal name.
+        day : str, optional
+            Day name.
+        session : str, optional
+            Session name.
+        nsigma : int, optional
+            Number of standard deviations for outlier removal.
+        """
+        def clean(vsdi, mask):
+            # Normalize vsdi
+            vsdi_norm = normalize_vsdi(vsdi, mask)
+            # Clean outliers
+            vsdi_clean = clean_outliers(vsdi_norm, nsigma)
+            # Clean outliers by mean interpolation
+            return vsdi_clean
+
+        def apply_clean(group, mask):
+            if isinstance(group, h5py.Dataset):
+                # Assuming 'vsdi', 'animal', 'day', 'session' are keys, not attributes
+                if group.name.split('/')[-1] == 'vsdi':
+                    vsdi_data = group[...]
+                    vsdi_data_cleaned = clean(vsdi_data, mask)
+                    # Create a new dataset for cleaned VSDI data
+                    if 'vsdi_clean' in group.parent:
+                        del group.parent['vsdi_clean']
+                    group.parent.create_dataset('vsdi_clean', data=vsdi_data_cleaned)
             else:
-                average = np.divide(np.add(vsdi[:,:,start-1][:, :, np.newaxis], vsdi[:,:,end+1][:, :, np.newaxis]), 2)
-                vsdi[:,:,start:end+1] = average
-        return vsdi
+                for key in group:
+                    apply_clean(group[key], mask)
 
-    def bimodality_test(self, distribution):
-        """
-        Test for bimodality using moving average to smooth the histogram
-        and get the x-axis location of the highest point in the histogram
-        """
-        # Create a histogram      
-        n, bins, patches = plt.hist(distribution, bins=1000)
-        # Define the window size for the moving average
-        window_size = 5
-        # Create the moving average kernel
-        kernel = np.ones(window_size) / window_size
-        # Convolve the histogram data with the moving average kernel
-        smoothed = np.convolve(n, kernel, mode='same')
-        bins_adjusted = bins[:-1]
-        
-        # Find the x-axis location of the highest point in the histogram
-        x_max = bins_adjusted[np.argmax(smoothed)]
+        if animal is not None and day is not None and session is not None:
+            mask = self.file[f"{animal}/{day}"]['mask'][...]
+            group = self.file[f"{animal}/{day}/{session}"]
+            apply_clean(group, mask)
+        elif animal is not None and day is not None:
+            mask = self.file[f"{animal}/{day}"]['mask'][...]
+            group = self.file[f"{animal}/{day}"]
+            apply_clean(group, mask)
+        elif animal is not None:
+            for day in self.file[animal].keys():
+                mask = self.file[f"{animal}/{day}"]['mask'][...]
+                group = self.file[animal][day]
+                apply_clean(group, mask)
+        else:
+            for animal in self.file.keys():
+                for day in self.file[animal].keys():
+                    mask = self.file[f"{animal}/{day}"]['mask'][...]
+                    group = self.file[animal][day]
+                    apply_clean(group, mask)
 
-        return x_max
-    
-    def bimodal_components(self, Y, threshold=1):
+    def get_data(self, animal=None, day=None, session=None, type=None):
         """
-        Get bimodal components
-        """
-        bimodal_components = []
-        for i in range(Y.shape[1]):
-            x_max = self.bimodality_test(Y[:,i])
-            if abs(x_max) > threshold:
-                bimodal_components.append([i, x_max])
+        Get data from the HDF5 file.
 
-        return bimodal_components
+        Parameters
+        ----------
+        animal : str, optional
+            Animal name.
+        day : str or list, optional
+            Day name or list of day names.
+        session : str, optional
+            Session name.
+        type : str, optional
+            Type of data.
+
+        Returns
+        -------
+        result : list
+            List of tuples containing the group name and data array.
+        """
+        days = [day] if isinstance(day, str) else day
+
+        def search(group):
+            result = []
+            for key in group:
+                if isinstance(group[key], h5py.Group):
+                    result.extend(search(group[key]))
+                elif ((animal is None or group.name.split('/')[1] == animal) and
+                      (days is None or group.name.split('/')[2] in days) and
+                      (session is None or group.name.split('/')[3] == session) and
+                      (type is None or key == type)):
+                    result.append((group.name.split('/')[1:], group[key][...]))
+            return result
+
+        return search(self.file)
