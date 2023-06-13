@@ -23,15 +23,13 @@ Preprocessing tools for voltage sensitive dye imaging data
 #### 1. Clone the repository
 
 ```bash
-git clone https://github.com/<your_username>/pipeline-vsdi.git
-cd pipeline-vsdi
+git clone https://github.com/dabadav/pipeline_vsdi.git
+cd pipeline_vsdi
 ```
-
-Replace `<your_username>` with your GitHub username or the username of the repository owner.
 
 #### 2. Install the package using Poetry
 
-Ensure you're in the `pipeline-vsdi` directory (or the directory where you cloned your repository) and run:
+Ensure you're in the `pipeline_vsdi` directory (or the directory where you cloned your repository) and run:
 
 ```bash
 poetry install
