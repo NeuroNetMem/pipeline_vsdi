@@ -9,6 +9,14 @@ preprocessing.clustering module
    :undoc-members:
    :show-inheritance:
 
+preprocessing.behavior module
+-----------------------------
+
+.. automodule:: preprocessing.behavior
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 preprocessing.utils module
 --------------------------
 
