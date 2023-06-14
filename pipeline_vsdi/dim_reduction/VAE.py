@@ -1,7 +1,27 @@
+"""
+Module for Nonlinear Dimensionality Reduction.
+
+This module provides functionalities for training, analyzing and performing various operations with Convolutional Autoencoders (Conv_AE). 
+
+Classes:
+    - Conv_AE: Defines a PyTorch model for a convolutional autoencoder, which includes an encoder and a decoder for image data compression and reconstruction, respectively.
+
+Functions:
+    - create_dataloader(dataset): Returns a PyTorch DataLoader prepared from a given dataset.
+    - train_autoencoder(model, dataloader, num_epochs): Trains the provided autoencoder model.
+    - predict(model, image): Returns the autoencoder's reconstruction of a given image.
+    - get_latent_vectors(model, dataloader): Returns latent representations of a given dataset.
+    - find_max_activation_images(model, dataloader): Identifies images that maximize the activation of each unit in the autoencoder's latent space.
+    - shuffle_2D_matrix(matrix): Shuffles a 2D matrix across both dimensions.
+    - linear_decoding_score(embeddings, features): Calculates the score of linear regression of embeddings to features.
+    - linear_decoding_error(embeddings, features): Computes the expected error of a linear decoder that uses the embeddings to predict certain features of the data.
+
+The module is specifically designed for the purpose of training a convolutional autoencoder to compress image data into a low-dimensional latent representation and evaluate the quality of these representations.
+"""
+
 import numpy as np
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
 import torch.optim as optim
 from torch.utils.data import DataLoader, TensorDataset
 from tqdm import tqdm
@@ -9,7 +29,32 @@ from sklearn.linear_model import LinearRegression
 from random import shuffle
   
 class Conv_AE(nn.Module):
+    """
+    Convolutional Autoencoder (Conv_AE) Class.
+    
+    This class implements a convolutional autoencoder using PyTorch's nn.Module. 
+    It includes an encoder and a decoder. The encoder compresses the input data 
+    into a latent space, and the decoder reconstructs the original data from 
+    the latent representation. The model is trained to minimize the difference 
+    between the input and the output of the autoencoder.
+    
+    Methods
+    -------
+    forward(x):
+        Passes the input through the encoder and decoder.
+    
+    backward(optimizer, criterion, x, y_true):
+        Computes the loss, performs backpropagation, and updates the model parameters.
+    """
     def __init__(self, latent_dim):
+        """
+        Initializes the Conv_AE class.
+
+        Parameters
+        ----------
+        latent_dim : int
+            Dimensionality of the latent space.
+        """
         super(Conv_AE, self).__init__()
         self.latent_dim = latent_dim
 
@@ -40,6 +85,22 @@ class Conv_AE(nn.Module):
         )
 
     def forward(self, x):
+        """
+        Passes the input through the encoder and decoder.
+        
+        Parameters
+        ----------
+        x : torch.Tensor
+            The input to the autoencoder.
+            
+        Returns
+        -------
+        reconstructed : torch.Tensor
+            The reconstructed input produced by the decoder.
+        
+        h : torch.Tensor
+            The latent representation of the input.
+        """
         # Encoder
         encoded = self.encoder(x)
         encoded = torch.flatten(encoded, start_dim=1)
@@ -53,6 +114,29 @@ class Conv_AE(nn.Module):
         return reconstructed, h
 
     def backward(self, optimizer, criterion, x, y_true):
+        """
+        Computes the loss, performs backpropagation, and updates the model parameters.
+        
+        Parameters
+        ----------
+        optimizer : torch.optim.Optimizer
+            The optimizer used to update the model parameters.
+            
+        criterion : torch.nn.modules.loss._Loss
+            The loss function used to measure the difference between the 
+            reconstructed input and the original input.
+        
+        x : torch.Tensor
+            The input to the autoencoder.
+            
+        y_true : torch.Tensor
+            The true values (same as the input for an autoencoder).
+            
+        Returns
+        -------
+        loss.item() : float
+            The computed loss value.
+        """
         optimizer.zero_grad()
         y_pred, _ = self.forward(x)
         mse = criterion(y_pred, y_true)
@@ -80,9 +164,44 @@ def create_dataloader(dataset, batch_size=128, reshuffle_after_epoch=True):
 
 
 def train_autoencoder(model, train_loader, dataset=[], num_epochs=1000, learning_rate=1e-3, L2_weight_decay=0):
-    '''
-    TO DO.
-    '''
+    """
+    Trains the autoencoder model.
+
+    This function trains the autoencoder model using the Adam optimizer 
+    and the Mean Squared Error loss function. It also tracks the history 
+    of loss values for each epoch, and optionally, the evolution of the 
+    latent vectors.
+
+    Parameters
+    ----------
+    model : Conv_AE
+        The autoencoder model to be trained.
+
+    train_loader : torch.utils.data.DataLoader
+        The data loader that provides batches of training data.
+
+    dataset : list, optional
+        If provided, this function will also track the evolution of the 
+        latent vectors for each data point in this dataset.
+
+    num_epochs : int, optional
+        The number of epochs for training the model. Default is 1000.
+
+    learning_rate : float, optional
+        The learning rate for the Adam optimizer. Default is 1e-3.
+
+    L2_weight_decay : float, optional
+        The weight decay (L2 penalty) for the Adam optimizer. Default is 0.
+
+    Returns
+    -------
+    history : list
+        A list containing the history of loss values for each epoch.
+
+    embeddings : numpy.ndarray
+        A numpy array containing the evolution of the latent vectors 
+        for each data point in the dataset (if provided).
+    """
     optimizer = optim.Adam(model.parameters(), lr=learning_rate, weight_decay=L2_weight_decay)
     criterion = nn.MSELoss()
 

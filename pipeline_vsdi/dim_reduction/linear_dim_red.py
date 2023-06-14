@@ -1,13 +1,19 @@
 """
-This module provides functions for performing dimensionality reduction on VSDI (Voltage-Sensitive Dye Imaging) data using PCA (Principal Component Analysis) and ICA (Independent Component Analysis).
+Linear Dimensionality Reduction Module.
+
+This module provides functionalities for performing Principal Component Analysis (PCA) and Independent Component Analysis (ICA) 
+on Voltage Sensitive Dye Imaging (VSDI) data.
+
+Functions:
+    - pca(vsdi, raw_mask=None, n_comp=10, normalize=True): Performs PCA on VSDI data and returns the principal components (fingerprints) and their corresponding timecourses.
+    - pca_ica(vsdi, mask): Performs PCA followed by ICA on VSDI data and returns the fingerprint patterns and their timecourses obtained from ICA, along with explained variance ratios from PCA.
 
 Dependencies:
-- numpy
-- sklearn
+    - sklearn.decomposition: PCA, FastICA
+    - sklearn.preprocessing: StandardScaler
+    - sklearn.pipeline: Pipeline
 
-Usage:
-- Use the `pca` function to perform PCA on VSDI data and obtain the principal components and timecourses.
-- Use the `pca_ica` function to perform PCA and ICA on VSDI data and obtain the fingerprint patterns, timecourses, and explained variance ratios.
+This module is designed for applying dimensionality reduction techniques to VSDI data, which is commonly used in neuroscience for imaging brain activity.
 """
 
 # Dimensionality reduction
