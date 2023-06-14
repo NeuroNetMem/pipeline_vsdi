@@ -1,0 +1,54 @@
+/* Limit size of html logo */
+.wy-side-nav-search > a img.logo {
+    height: 80px;
+}
+
+/* Hide "On Read the Docs", "On GitHub", and "Search" section from versions menu */
+div.rst-versions > div.rst-other-versions > div.injected > dl:nth-child(2) {
+    display: none;
+}
+div.rst-versions > div.rst-other-versions > div.injected > dl:nth-child(3) {
+    display: none;
+}
+div.rst-versions > div.rst-other-versions > div.injected > dl:nth-child(4) {
+    display: none;
+}
+
+/* Sidebar selected style */
+.wy-menu-vertical li.current > a {
+    background: #ffffff;
+}
+.wy-menu-vertical li.current > ul {
+    background: #F0E3DF;
+}
+
+/* Sidebar style */
+.wy-side-nav-search,
+.wy-nav-top,
+.wy-side-scroll {
+    background: #202029;
+}
+
+.wy-nav-top,
+.wy-side-nav-search a, .wy-side-nav-search a:visited, .wy-side-nav-search a:hover,
+.wy-nav-top a, .wy-nav-top a:visited, .wy-nav-top a:hover,
+.wy-side-scroll a, .wy-side-scroll a:visited, .wy-side-scroll a:hover {
+    color: #BE9B89
+}
+
+.rst-versions a, .rst-versions a:visited, .rst-versions a:hover {
+    color: #fcfcfc
+}
+
+/* Make main content larger */
+body > div:nth-child(1) > section > div {
+    max-width: 1200px;
+}
+
+/* Links */
+a, a:visited {
+    color: black;
+}
+a:hover {
+    color: #2980B9;
+}
