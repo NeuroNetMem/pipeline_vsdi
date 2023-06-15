@@ -19,8 +19,8 @@ Usage
 
 from scipy.io import loadmat
 import h5py
-import pipeline_vsdi.vsdi.loaders as loaders
-from pipeline_vsdi.preprocessing.behavior import make_design_matrix
+import vsdi.io as loaders
+from vsdi.utils import make_design_matrix
 
 class DataLoader:
     """

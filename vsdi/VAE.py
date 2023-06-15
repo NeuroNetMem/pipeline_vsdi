@@ -1,22 +1,7 @@
 """
 Module for Nonlinear Dimensionality Reduction.
 
-This module provides functionalities for training, analyzing and performing various operations with Convolutional Autoencoders (Conv_AE). 
-
-Classes:
-    - Conv_AE: Defines a PyTorch model for a convolutional autoencoder, which includes an encoder and a decoder for image data compression and reconstruction, respectively.
-
-Functions:
-    - create_dataloader(dataset): Returns a PyTorch DataLoader prepared from a given dataset.
-    - train_autoencoder(model, dataloader, num_epochs): Trains the provided autoencoder model.
-    - predict(model, image): Returns the autoencoder's reconstruction of a given image.
-    - get_latent_vectors(model, dataloader): Returns latent representations of a given dataset.
-    - find_max_activation_images(model, dataloader): Identifies images that maximize the activation of each unit in the autoencoder's latent space.
-    - shuffle_2D_matrix(matrix): Shuffles a 2D matrix across both dimensions.
-    - linear_decoding_score(embeddings, features): Calculates the score of linear regression of embeddings to features.
-    - linear_decoding_error(embeddings, features): Computes the expected error of a linear decoder that uses the embeddings to predict certain features of the data.
-
-The module is specifically designed for the purpose of training a convolutional autoencoder to compress image data into a low-dimensional latent representation and evaluate the quality of these representations.
+This module provides functionalities for training, analyzing and performing various operations with Convolutional Autoencoders (Conv_AE). The module is specifically designed for the purpose of training a convolutional autoencoder to compress image data into a low-dimensional latent representation and evaluate the quality of these representations.
 """
 
 import numpy as np
@@ -37,14 +22,6 @@ class Conv_AE(nn.Module):
     into a latent space, and the decoder reconstructs the original data from 
     the latent representation. The model is trained to minimize the difference 
     between the input and the output of the autoencoder.
-    
-    Methods
-    -------
-    forward(x):
-        Passes the input through the encoder and decoder.
-    
-    backward(optimizer, criterion, x, y_true):
-        Computes the loss, performs backpropagation, and updates the model parameters.
     """
     def __init__(self, latent_dim):
         """
@@ -375,3 +352,4 @@ def linear_decoding_error(embeddings, features, norm=1):
     mean_dist = np.mean(dist) / norm
 
     return mean_dist
+

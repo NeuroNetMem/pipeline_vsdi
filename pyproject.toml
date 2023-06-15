@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "pipeline_vsdi"
+name = "vsdi"
 version = "0.1.0"
 description = "Preprocessing tools for voltage sensitive dye imaging data"
 authors = ["NeuroNetMem"]

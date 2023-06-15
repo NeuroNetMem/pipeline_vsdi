@@ -8,7 +8,7 @@
 
 import os
 import sys
-sys.path.insert(0, os.path.abspath('../pipeline_vsdi'))
+sys.path.insert(0, os.path.abspath('../..'))
 
 project = 'VSDI Pipeline'
 copyright = '2023, NeuroNetMem'
@@ -19,11 +19,12 @@ release = '0.1.0'
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
 # extensions = ['sphinx.ext.autodoc',
-#               'numpydoc',
-#               'sphinx.ext.autosummary',
-#               'sphinx_design']
-extensions = ["sphinx.ext.napoleon", "autodocsumm"]
+extensions = ["autodocsumm",
+	      "numpydoc",
+	      "sphinx.ext.graphviz"]
+
 autodoc_default_options = {"autosummary": True}
+numpydoc_show_class_members = False
 
 templates_path = ['_templates']
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
@@ -43,6 +44,7 @@ html_static_path = ['_static']
 
 def setup(app):
     app.add_css_file("custom.css")
+
 # -----------------------------------------------------------------------------
 # Autosummary
 # -----------------------------------------------------------------------------

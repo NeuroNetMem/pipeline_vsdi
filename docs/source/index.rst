@@ -10,16 +10,11 @@ Preprocessing tools for voltage sensitive dye imaging data
 
 .. toctree::
    :maxdepth: 1
-   :caption: Setup Documentation
-
-   deploy/deployment
-
-.. toctree::
-   :maxdepth: 1
    :caption: Code Documentation
 
-   components/vsdi
-   components/preprocessing 
-   components/dim_reduction 
-   components/visualization 
-   
+   vsdi.io
+   vsdi.linear_dim_red
+   vsdi.session
+   vsdi.utils
+   vsdi.VAE
+   vsdi.visualization
