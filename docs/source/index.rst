@@ -6,7 +6,24 @@
 VSDI Pipeline
 =========================================
 
-Preprocessing tools for voltage sensitive dye imaging data
+Package for handling voltage sensitive dye imaging data
+
+.. graphviz::
+
+   digraph architecture {
+       rankdir=LR;
+       node [shape=box, style=filled, color=lightblue];
+
+       "VSDI data" [shape=ellipse, color=lightgrey];
+       "VSDI data" -> "io";
+       "io" -> "session";
+       "io" -> "utils";
+       "io" -> "dimensionality\nreduction";
+       "session" -> "utils";
+       "session" -> "dimensionality\nreduction";
+       "dimensionality\nreduction" -> "visualization";
+       "utils" -> "visualization";
+   }
 
 .. toctree::
    :maxdepth: 1
