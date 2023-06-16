@@ -30,8 +30,8 @@ Package for handling voltage sensitive dye imaging data
    :caption: Code Documentation
 
    vsdi.io
-   vsdi.linear_dim_red
-   vsdi.session
+   vsdi.dim_reduction
+   vsdi.embeddings
    vsdi.utils
    vsdi.VAE
    vsdi.visualization

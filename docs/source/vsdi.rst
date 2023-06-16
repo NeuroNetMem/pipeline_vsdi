@@ -8,9 +8,9 @@ Submodules
    :maxdepth: 4
 
    vsdi.VAE
+   vsdi.dim_reduction
+   vsdi.embeddings
    vsdi.io
-   vsdi.linear_dim_red
-   vsdi.session
    vsdi.utils
    vsdi.visualization
 

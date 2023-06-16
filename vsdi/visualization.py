@@ -6,11 +6,11 @@ import numpy as np
 import seaborn as sns
 from scipy.stats import sem
 from scipy.ndimage import gaussian_filter1d
-sns.set_theme(context='notebook',
-              style='white',
-              font_scale=1.5,
-              rc = {'axes.spines.top':False,'axes.spines.right':False,
-                    'image.cmap':plt.cm.jet})
+# sns.set_theme(context='notebook',
+#               style='white',
+#               font_scale=1.5,
+#               rc = {'axes.spines.top':False,'axes.spines.right':False,
+#                     'image.cmap':plt.cm.jet})
 
 ##########################################################
 
@@ -81,7 +81,6 @@ def plot_fingerprints(PCs, raw_mask):
         plt.axis('off')
 
 def create_frame(vsdi, t):
-    # VSDI - Should be already masked
     plt.imshow(vsdi[:,:,t], cmap=plt.cm.jet)
     plt.axis('off')
 
