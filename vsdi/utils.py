@@ -272,6 +272,27 @@ def store_indices(animals, days, sessions, outpath):
 ### VSDI ###
 ############
 
+def apply_mask(vsdi, mask):
+    """
+    Apply a mask to a numpy array and set masked values to NaN.
+
+    Parameters
+    ----------
+    vsdi : np.ndarray
+        The input array on which to apply the mask.
+    mask : np.ndarray
+        The mask to be applied. Same shape as `vsdi`. Masked locations are where mask equals 0.
+
+    Returns
+    -------
+    np.ndarray
+        A new array with the mask applied (i.e., positions where mask equals 0 are set to NaN).
+
+    """
+    vsdi_copy = vsdi.copy()
+    vsdi_copy[np.where(mask == 0)] = np.nan
+    return vsdi_copy
+
 def pca_ica(vsdi, mask):
     X = vsdi.transpose(2, 0, 1)
     X = X*mask
