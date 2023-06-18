@@ -353,3 +353,13 @@ def linear_decoding_error(embeddings, features, norm=1):
 
     return mean_dist
 
+def extract_hidden_features(model, clamping_value=1.):
+    features = []
+    for i in np.arange(model.latent_dim):
+        input_ = torch.zeros(model.latent_dim).to('cuda')
+        input_[i] = clamping_value
+        input_ = input_.unsqueeze(0)
+        img = model.decoder(input_)[0].detach().cpu().numpy()
+        features.append(np.transpose(img, (1,2,0)))
+        
+    return np.array(features)
