@@ -8,7 +8,6 @@
 
 import os
 import sys
-import graphviz
 sys.path.insert(0, os.path.abspath('../..'))
 
 project = 'VSDI Pipeline'
