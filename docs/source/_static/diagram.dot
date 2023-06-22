@@ -1,0 +1,14 @@
+digraph architecture {
+    rankdir=LR;
+    node [shape=box, style=filled, color=lightblue];
+
+    "VSDI data" [shape=ellipse, color=lightgrey];
+    "VSDI data" -> "io";
+    "io" -> "session";
+    "io" -> "utils";
+    "io" -> "dimensionality\nreduction";
+    "session" -> "utils";
+    "session" -> "dimensionality\nreduction";
+    "dimensionality\nreduction" -> "visualization";
+    "utils" -> "visualization";
+}
