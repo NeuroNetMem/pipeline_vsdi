@@ -33,7 +33,6 @@ def read_vsdi_file(filename, precision='>f'):
 
     n_frames = int(filename.split('x')[0].split('fr')[0].split('_')[-1])
 
-
     w = int(filename.split('x')[0].split('_')[-1])
     h = int(filename.split('x')[1].split('_')[0])
     video = read_raw_file(filename, h, w, n_frames, precision=precision)
@@ -47,12 +46,12 @@ def read_raw_file(filename, h, w, n_frames, precision='>f'):
     img = np.reshape(img, [h, w, n_frames], order="F")
     return img
 
-#to implement
+# to implement
+
 
 def read_vr_log():
     pass
 
+
 def read_lfp_file():
     pass
-
-
