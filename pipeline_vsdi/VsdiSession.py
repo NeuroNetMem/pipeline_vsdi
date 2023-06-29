@@ -16,11 +16,48 @@ Usage
 3. Use the `clean_vsdi` method to clean VSDI data by removing outliers.
 4. Use the `get_data` method to retrieve data from the HDF5 file.
 """
-
-from scipy.io import loadmat
+import os
 import h5py
-import vsdi.io as loaders
-from vsdi.utils import make_design_matrix
+
+
+class VsdiSession:
+    
+    def __init__(self, data=None):
+        
+        self.metadata = {}
+        self.vsdi_video = None
+        self.vsdi_time = None
+        self.vsdi_mask = None
+        self.behaviour = None
+        self.lfp = None
+        
+        
+        if data is not None:
+            if os.path.isdir(data):
+                self.initialize_from_folder(data)
+            elif os.path.isfile(data):
+                self.initialize_from_file(data)
+            else:
+                raise ValueError("Invalid input. Expected a folder or an HDF5 file.")
+    
+    def initialize_from_folder(self, folder):
+        pass
+    
+    def initialize_from_hdf5_file(self, file):
+        pass
+        
+        
+    def get_flat_vsdi(self):
+        
+        pass
+    
+    def set_vsdi_from_flat(self,flat_vsdi):
+        pass
+    
+    def to_hdf5():
+        pass
+    
+    
 
 class DataLoader:
     """
