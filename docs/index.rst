@@ -5,12 +5,25 @@
 
 Welcome to pipeline_vsdi's documentation!
 =========================================
-
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
 
    modules
+
+.. toctree::
+   :maxdepth: 2
+   :caption: How-to guides and examples:
+
+   examples
+
+.. toctree::
+   :maxdepth: 2
+   :caption: API reference:
+
+   modules
+
+
 
 
 Indices and tables
