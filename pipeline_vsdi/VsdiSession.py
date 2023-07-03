@@ -1,63 +1,99 @@
 """
-This module provides a `DataLoader` class for handling VSDI (Voltage-Sensitive Dye Imaging) data stored in HDF5 files.
+This module provides a `VSDISession` class for handling VSDI (Voltage-Sensitive Dye Imaging) data, behaviour data
+and metadata for a given experimental session in a single interface.
 
 Dependencies
 ------------
 - numpy
-- scipy
 - h5py
-- loaders (imported but not defined within this file)
-- pipeline_vsdi.preprocessing.utils (imported but not defined within this file)
+- io 
 
 Usage
 -----
-1. Create a `DataLoader` instance by providing the path to the HDF5 file and the directory containing the VSI data files.
-2. Use the `load_data` method to load VSI data into the HDF5 file.
-3. Use the `clean_vsdi` method to clean VSDI data by removing outliers.
-4. Use the `get_data` method to retrieve data from the HDF5 file.
+1. Create a `VSDISession` empty instance. 
+2. Add data from files with the load functions
+3. Use VSDISession object to interface with all the functionality in this pipeline package
+
+Coming soon
+----
+- `load_from_folder` method that takes a given folder structure and loads all data together.
+- `load_from_hdf5` and `to_hdf5` method that loads and saves session in consistent structure.
+
 """
 import os
 import h5py
+import numpy as np
+
+import io
 
 
 class VsdiSession:
-    
+
     def __init__(self, data=None):
-        
+
         self.metadata = {}
         self.vsdi_video = None
         self.vsdi_time = None
         self.vsdi_mask = None
         self.behaviour = None
         self.lfp = None
-        
-        
+
         if data is not None:
             if os.path.isdir(data):
                 self.initialize_from_folder(data)
             elif os.path.isfile(data):
                 self.initialize_from_file(data)
             else:
-                raise ValueError("Invalid input. Expected a folder or an HDF5 file.")
-    
+                raise ValueError(
+                    "Invalid input. Expected a folder or an HDF5 file.")
+
     def initialize_from_folder(self, folder):
         pass
-    
+
     def initialize_from_hdf5_file(self, file):
         pass
-        
-        
+
+    def load_vsdi_fromfile(self, video_file):
+        self.vsdi_video = io.read_vsdi_file(video_file)
+        return
+
+    def load_mask_fromfile(self, mask_file):
+        self.vsdi_mask = np.load(mask_file)
+        return
+
+    def load_behaviour_fromfile(self, logfile):
+        self.behaviour = io.read_vr_log()
+
+    def load_lfp_fromfile(self, lfp_file):
+        self.lfp = io.read_lfp_file()
+
+    def add_metadata(self, metadata_dict):
+        required_keys = ['animal', 'session', 'vsdi_fps']
+
+        if all(key in metadata_dict for key in required_keys):
+            self.metadata = metadata_dict
+        else:
+            missing_keys = [
+                key for key in required_keys if key not in metadata_dict]
+            raise ValueError(f"Missing required keys: {missing_keys}")
+
+        return
+
     def get_flat_vsdi(self):
-        
+        '''
+        Returns the vsdi video if a flattened format, ready for Machine Learning applications.
+        The video is subsetted with the cortical mask, flattened and transpose to have shape (n_samples x n_features)
+        '''
+        flat_vsdi = self.vsdi_video[self.vsdi_mask, :].T
+
+        return flat_vsdi
+
+    def set_vsdi_from_flat(self, flat_vsdi):
         pass
-    
-    def set_vsdi_from_flat(self,flat_vsdi):
-        pass
-    
+
     def to_hdf5():
         pass
-    
-    
+
 
 class DataLoader:
     """
@@ -68,6 +104,7 @@ class DataLoader:
     filepath : str
         Path to the HDF5 file to be loaded.
     """
+
     def __init__(self, filepath):
         """Initialize the DataLoader."""
         self.filepath = filepath
@@ -100,7 +137,7 @@ class DataLoader:
             List of day names.
         sessions : list
             List of session names.
-        """     
+        """
         for animal in animals:
             animal_group = self.file.require_group(animal)
 
@@ -108,7 +145,8 @@ class DataLoader:
                 day_group = animal_group.require_group(day)
 
                 # Load mask file for each day
-                mask = loadmat(datapath.joinpath(f'{animal}/{day}/vsdi_mask.mat'))['mask']
+                mask = loadmat(datapath.joinpath(
+                    f'{animal}/{day}/vsdi_mask.mat'))['mask']
                 if 'mask' in day_group:
                     del day_group['mask']
                 day_group.create_dataset('mask', data=mask)
@@ -117,7 +155,8 @@ class DataLoader:
                     session_group = day_group.require_group(session)
 
                     # Load matlab behavioural file
-                    atc = loadmat(datapath.joinpath(f'{animal}/{day}/{session}.mat'))
+                    atc = loadmat(datapath.joinpath(
+                        f'{animal}/{day}/{session}.mat'))
 
                     # Extract dictionary
                     b_data = loaders.extract_behavioural_data(atc)
@@ -129,12 +168,13 @@ class DataLoader:
                     session_group.create_dataset('behavioral', data=X_matrix)
 
                     # Load VSDI
-                    vsdi = loadmat(datapath.joinpath(f'{animal}/{day}/vsdi_{session}.mat'))['vsdi_data']
+                    vsdi = loadmat(datapath.joinpath(
+                        f'{animal}/{day}/vsdi_{session}.mat'))['vsdi_data']
 
                     if 'vsdi' in session_group:
                         del session_group['vsdi']
                     session_group.create_dataset('vsdi', data=vsdi)
-                    
+
                     # Extract LFP data
                     lfp = loaders.extract_lfp_data(atc)
 
@@ -174,7 +214,8 @@ class DataLoader:
                     # Create a new dataset for cleaned VSDI data
                     if 'vsdi_clean' in group.parent:
                         del group.parent['vsdi_clean']
-                    group.parent.create_dataset('vsdi_clean', data=vsdi_data_cleaned)
+                    group.parent.create_dataset(
+                        'vsdi_clean', data=vsdi_data_cleaned)
             else:
                 for key in group:
                     apply_clean(group[key], mask)

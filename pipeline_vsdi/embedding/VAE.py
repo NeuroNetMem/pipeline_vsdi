@@ -1,7 +1,9 @@
 """
 Module for Nonlinear Dimensionality Reduction.
 
-This module provides functionalities for training, analyzing and performing various operations with Convolutional Autoencoders (Conv_VAE). The module is specifically designed for the purpose of training a convolutional autoencoder to compress image data into a low-dimensional latent representation and evaluate the quality of these representations.
+This module provides functionalities for training, analyzing and performing various operations with Convolutional Autoencoders (Conv_VAE). 
+The module is specifically designed for the purpose of training a convolutional autoencoder to compress image data into a low-dimensional latent 
+representation and evaluate the quality of these representations.
 """
 
 import numpy as np
@@ -12,17 +14,19 @@ from torch.utils.data import DataLoader, TensorDataset
 from tqdm import tqdm
 from sklearn.linear_model import LinearRegression
 from random import shuffle
-  
+
+
 class Conv_AE(nn.Module):
     """
     Convolutional Autoencoder (Conv_AE) Class.
-    
+
     This class implements a convolutional autoencoder using PyTorch's nn.Module. 
     It includes an encoder and a decoder. The encoder compresses the input data 
     into a latent space, and the decoder reconstructs the original data from 
     the latent representation. The model is trained to minimize the difference 
     between the input and the output of the autoencoder.
     """
+
     def __init__(self, latent_dim):
         """
         Initializes the Conv_AE class.
@@ -44,7 +48,7 @@ class Conv_AE(nn.Module):
             nn.Conv2d(32, 64, kernel_size=3, stride=1, padding=1),
             nn.ReLU()
         )
-        
+
         # Linear layer for mean and variance
         self.fc = nn.Linear(64 * 84 * 48, self.latent_dim)
 
@@ -64,17 +68,17 @@ class Conv_AE(nn.Module):
     def forward(self, x):
         """
         Passes the input through the encoder and decoder.
-        
+
         Parameters
         ----------
         x : torch.Tensor
             The input to the autoencoder.
-            
+
         Returns
         -------
         reconstructed : torch.Tensor
             The reconstructed input produced by the decoder.
-        
+
         h : torch.Tensor
             The latent representation of the input.
         """
@@ -93,22 +97,22 @@ class Conv_AE(nn.Module):
     def backward(self, optimizer, criterion, x, y_true):
         """
         Computes the loss, performs backpropagation, and updates the model parameters.
-        
+
         Parameters
         ----------
         optimizer : torch.optim.Optimizer
             The optimizer used to update the model parameters.
-            
+
         criterion : torch.nn.modules.loss._Loss
             The loss function used to measure the difference between the 
             reconstructed input and the original input.
-        
+
         x : torch.Tensor
             The input to the autoencoder.
-            
+
         y_true : torch.Tensor
             The true values (same as the input for an autoencoder).
-            
+
         Returns
         -------
         loss.item() : float
@@ -135,8 +139,9 @@ def create_dataloader(dataset, batch_size=128, reshuffle_after_epoch=True):
         DataLoader (Pytorch DataLoader): dataloader that is ready to be used for training an autoencoder.
     '''
     if dataset.shape[-1] == 3:
-        dataset = np.transpose(dataset, (0,3,1,2))
-    tensor_dataset = TensorDataset(torch.from_numpy(dataset).float(), torch.from_numpy(dataset).float())
+        dataset = np.transpose(dataset, (0, 3, 1, 2))
+    tensor_dataset = TensorDataset(torch.from_numpy(
+        dataset).float(), torch.from_numpy(dataset).float())
     return DataLoader(tensor_dataset, batch_size=batch_size, shuffle=reshuffle_after_epoch)
 
 
@@ -179,7 +184,8 @@ def train_autoencoder(model, train_loader, dataset=[], num_epochs=1000, learning
         A numpy array containing the evolution of the latent vectors 
         for each data point in the dataset (if provided).
     """
-    optimizer = optim.Adam(model.parameters(), lr=learning_rate, weight_decay=L2_weight_decay)
+    optimizer = optim.Adam(
+        model.parameters(), lr=learning_rate, weight_decay=L2_weight_decay)
     criterion = nn.MSELoss()
 
     model = model.to('cuda')
@@ -187,7 +193,7 @@ def train_autoencoder(model, train_loader, dataset=[], num_epochs=1000, learning
     history = []
     embeddings = []
     if len(dataset) > 0:
-        embeddings = [ get_latent_vectors(dataset=dataset, model=model) ]
+        embeddings = [get_latent_vectors(dataset=dataset, model=model)]
     for epoch in range(num_epochs):
         running_loss = 0.
         with tqdm(total=len(train_loader)) as pbar:
@@ -195,16 +201,18 @@ def train_autoencoder(model, train_loader, dataset=[], num_epochs=1000, learning
                 inputs, _ = data
                 inputs = inputs.to('cuda')
 
-                loss = model.backward(optimizer=optimizer, criterion=criterion, x=inputs, y_true=inputs)
+                loss = model.backward(
+                    optimizer=optimizer, criterion=criterion, x=inputs, y_true=inputs)
                 running_loss += loss
 
                 pbar.update(1)
-                pbar.set_description(f"Epoch {epoch+1}/{num_epochs}, Loss: {running_loss/len(train_loader):.4f}")
+                pbar.set_description(
+                    f"Epoch {epoch+1}/{num_epochs}, Loss: {running_loss/len(train_loader):.4f}")
 
         history.append(running_loss/len(train_loader))
 
         if len(dataset) > 0:
-            embeddings.append( get_latent_vectors(dataset=dataset, model=model) )
+            embeddings.append(get_latent_vectors(dataset=dataset, model=model))
 
     embeddings = np.array(embeddings)
 
@@ -223,13 +231,14 @@ def predict(image, model):
         output_img (3D numpy array): output image with shape (n_pixels_height, n_pixels_width, n_channels)
     '''
     if image.shape[-1] <= 4:
-        image = np.transpose(image, (2,0,1))
+        image = np.transpose(image, (2, 0, 1))
     n_channels, n_pixels_height, n_pixels_width = image.shape
     image = np.reshape(image, (1, n_channels, n_pixels_height, n_pixels_width))
     image = torch.from_numpy(image).float().to(next(model.parameters()).device)
     output_img = model(image)[0].detach().cpu().numpy()
-    output_img = np.reshape(output_img, (n_channels, n_pixels_height, n_pixels_width))
-    output_img = np.transpose(output_img, (1,2,0))
+    output_img = np.reshape(
+        output_img, (n_channels, n_pixels_height, n_pixels_width))
+    output_img = np.transpose(output_img, (1, 2, 0))
     return output_img
 
 
@@ -245,9 +254,11 @@ def get_latent_vectors(dataset, model, batch_size=128):
         latent_vectors (2D numpy array): latent activation vectors, matrix with shape (n_samples, n_hidden), where n_hidden is the number of units in the hidden layer.
     '''
     if dataset.shape[-1] <= 4:
-        dataset = np.transpose(dataset, (0,3,1,2))
-    tensor_dataset = TensorDataset(torch.from_numpy(dataset).float(), torch.from_numpy(dataset).float())
-    data_loader = DataLoader(tensor_dataset, batch_size=batch_size, shuffle=False)
+        dataset = np.transpose(dataset, (0, 3, 1, 2))
+    tensor_dataset = TensorDataset(torch.from_numpy(
+        dataset).float(), torch.from_numpy(dataset).float())
+    data_loader = DataLoader(
+        tensor_dataset, batch_size=batch_size, shuffle=False)
     model.eval()
     latent_vectors = []
     with torch.no_grad():
@@ -263,7 +274,8 @@ def find_max_activation_images(model, n_hidden, img_shape=[1, 84, 49]):
     images = []
     for i in range(n_hidden):
         # Initialize input image
-        x = torch.randn(1, img_shape[0], img_shape[1], img_shape[2], device='cuda', requires_grad=True)
+        x = torch.randn(1, img_shape[0], img_shape[1],
+                        img_shape[2], device='cuda', requires_grad=True)
 
         # Use optimizer to perform gradient ascent
         optimizer = optim.Adam([x], lr=1e-3)
@@ -296,7 +308,7 @@ def shuffle_2D_matrix(m):
     shuffle(ind_shuffled)
     ind_shuffled = ind_shuffled.reshape((m.shape[0], m.shape[1]))
     ind_x = (ind_shuffled/m.shape[1]).astype(np.int_)
-    ind_y = (ind_shuffled%m.shape[1]).astype(np.int_)
+    ind_y = (ind_shuffled % m.shape[1]).astype(np.int_)
     m_shuffled = m[ind_x, ind_y]
     return m_shuffled
 
@@ -324,7 +336,8 @@ def linear_decoding_score(embeddings, features, n_baseline=10000):
         embeddings_shuffled = shuffle_2D_matrix(np.copy(embeddings))
         linear_model_baseline = LinearRegression()
         linear_model_baseline.fit(embeddings_shuffled, features)
-        random_score = linear_model_baseline.score(embeddings_shuffled, features)
+        random_score = linear_model_baseline.score(
+            embeddings_shuffled, features)
         baselines.append(random_score)
 
     baseline_score = [np.mean(baselines), np.std(baselines)]
@@ -353,6 +366,7 @@ def linear_decoding_error(embeddings, features, norm=1):
 
     return mean_dist
 
+
 def extract_hidden_features(model, clamping_value=1.):
     features = []
     for i in np.arange(model.latent_dim):
@@ -360,6 +374,6 @@ def extract_hidden_features(model, clamping_value=1.):
         input_[i] = clamping_value
         input_ = input_.unsqueeze(0)
         img = model.decoder(input_)[0].detach().cpu().numpy()
-        features.append(np.transpose(img, (1,2,0)))
-        
+        features.append(np.transpose(img, (1, 2, 0)))
+
     return np.array(features)
