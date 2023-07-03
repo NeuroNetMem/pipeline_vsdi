@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "pipeline-vsdi"
+version = "1.0.0"
+description = "Software for handling and processing Voltage Sensitive Dye Imaging data and Virtual Reality logfiles"
+authors = ["davidespalla <davide.spalla@gmail.com>"]
+license = "Apache 2"
+readme = "README.md"
+packages = [{include = "pipeline_vsdi"}]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
