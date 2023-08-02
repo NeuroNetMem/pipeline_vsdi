@@ -29,13 +29,13 @@ import io
 
 class VsdiSession:
 
-    def __init__(self, data=None):
+    def __init__(self, data=None, metadata=None):
 
         self.metadata = {}
         self.vsdi_video = None
         self.vsdi_time = None
         self.vsdi_mask = None
-        self.behaviour = None
+        self.vr_data = None
         self.lfp = None
 
         if data is not None:
@@ -47,8 +47,27 @@ class VsdiSession:
                 raise ValueError(
                     "Invalid input. Expected a folder or an HDF5 file.")
 
-    def initialize_from_folder(self, folder):
-        pass
+        if metadata is not None:
+            self.metadata = metadata
+
+    def initialize_from_raw_data(self, folder):
+
+        # read vsdi and b64 files from folder
+
+        try:
+            self.vsdi_video = io.read_vsdi_file(vsdi_file)
+        except FileNotFoundError:
+            print('Vsdi video not found')
+
+        try:
+            self.vr_data = io.read_vr_log(vr_file)
+        except FileNotFoundError:
+            print('VR logfile not found')
+
+        try:
+            self.lfp = io.read_lfp_file()
+        except FileNotFoundError:
+            print('LFP file not found')
 
     def initialize_from_hdf5_file(self, file):
         pass
@@ -61,8 +80,8 @@ class VsdiSession:
         self.vsdi_mask = np.load(mask_file)
         return
 
-    def load_behaviour_fromfile(self, logfile):
-        self.behaviour = io.read_vr_log()
+    def load_vr_fromfile(self, logfile):
+        self.vr_data = io.read_vr_log()
 
     def load_lfp_fromfile(self, lfp_file):
         self.lfp = io.read_lfp_file()
