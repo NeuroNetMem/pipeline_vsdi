@@ -1,5 +1,6 @@
 import numpy as np
 from tqdm import tqdm
+import tifffile
 
 
 def read_raw_file(filename, h, w, start_frame=0,end_frame=None, precision='>f'): 
@@ -165,6 +166,23 @@ def read_and_downsample_vsdi(filename, stride, start_frame = 0, end_frame= None,
 
 
     return out_video
+
+
+def read_mask_tifffile(tif_file):
+    """
+    Read a TIF image file containing a mask and return its data as a NumPy array, 
+    transposed to match the vsdi video shape (h,w).
+
+    Parameters:
+    tif_file (str): The path to the TIF image file.
+
+    Returns:
+    numpy.ndarray: A NumPy array representing the mask image data, transposed to match vsdi video(h,w).
+    """
+
+
+    
+    return tifffile.imread(tif_file).T
 
 
 def decode_b64_file(filepath, verbose=False):
