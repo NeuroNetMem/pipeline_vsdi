@@ -2332,6 +2332,26 @@ files = [
 ]
 
 [[package]]
+name = "tqdm"
+version = "4.65.2"
+description = "Fast, Extensible Progress Meter"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "tqdm-4.65.2-py3-none-any.whl", hash = "sha256:6c431f7dee4f57284c8f4bd2eb1d4af00d730d38cc6098bd79880bcbec676276"},
+    {file = "tqdm-4.65.2.tar.gz", hash = "sha256:5f7d8b4ac76016ce9d51a7f0ea30d30984888d97c474fdc4a4148abfb5ee76aa"},
+]
+
+[package.dependencies]
+colorama = {version = "*", markers = "platform_system == \"Windows\""}
+
+[package.extras]
+dev = ["pytest (>=6)", "pytest-cov", "pytest-timeout", "pytest-xdist"]
+notebook = ["ipywidgets (>=6)"]
+slack = ["slack-sdk"]
+telegram = ["requests"]
+
+[[package]]
 name = "traitlets"
 version = "5.9.0"
 description = "Traitlets Python configuration system"
@@ -2459,4 +2479,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9"
-content-hash = "8b30294696f376d8d6884689712032a1e1b4d3a83a7699011d26e313eac3551e"
+content-hash = "8431f915a973d8fa1eca74e9a8b0f1a121aa7080d3658332201c1cf0e4480f77"
