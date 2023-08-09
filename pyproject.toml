@@ -9,6 +9,10 @@ packages = [{include = "pipeline_vsdi"}]
 
 [tool.poetry.dependencies]
 python = "^3.9"
+jupyterlab = "^4.0.4"
+numpy = "^1.25.2"
+matplotlib = "^3.7.2"
+torch = "^2.0.1"
 
 
 [build-system]
