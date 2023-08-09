@@ -9,6 +9,13 @@ packages = [{include = "pipeline_vsdi"}]
 
 [tool.poetry.dependencies]
 python = "^3.9"
+jupyterlab = "^4.0.4"
+numpy = "^1.25.2"
+matplotlib = "^3.7.2"
+torch = "^2.0.1"
+tqdm = "^4.65.2"
+tifffile = "^2023.7.18"
+opencv-python = "^4.8.0.74"
 
 
 [build-system]

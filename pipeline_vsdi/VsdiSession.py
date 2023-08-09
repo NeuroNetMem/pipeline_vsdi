@@ -2,53 +2,24 @@
 This module provides a `VSDISession` class for handling VSDI (Voltage-Sensitive Dye Imaging) data, behaviour data
 and metadata for a given experimental session in a single interface.
 
-Dependencies
-------------
-- numpy
-- h5py
-- io 
-
-Usage
------
-1. Create a `VSDISession` empty instance. 
-2. Add data from files with the load functions
-3. Use VSDISession object to interface with all the functionality in this pipeline package
-
-Coming soon
-----
-- `load_from_folder` method that takes a given folder structure and loads all data together.
-- `load_from_hdf5` and `to_hdf5` method that loads and saves session in consistent structure.
-
 """
 import os
+from dataclasses import dataclass
 import h5py
 import numpy as np
 
 import io
 
 
+@dataclass
 class VsdiSession:
 
-    def __init__(self, data=None, metadata=None):
-
-        self.metadata = {}
-        self.vsdi_video = None
-        self.vsdi_time = None
-        self.vsdi_mask = None
-        self.vr_data = None
-        self.lfp = None
-
-        if data is not None:
-            if os.path.isdir(data):
-                self.initialize_from_folder(data)
-            elif os.path.isfile(data):
-                self.initialize_from_file(data)
-            else:
-                raise ValueError(
-                    "Invalid input. Expected a folder or an HDF5 file.")
-
-        if metadata is not None:
-            self.metadata = metadata
+    metadata: dict = None
+    vsdi_video: np.array = None
+    vsdi_time: np.array = None
+    vsdi_mask: np.array = None
+    vr_data: dict = None
+    lfp: dict = None
 
     def initialize_from_raw_data(self, folder):
 
@@ -112,6 +83,47 @@ class VsdiSession:
 
     def to_hdf5():
         pass
+
+def save_vsdi_session(filename, vsdi_session):
+    with h5py.File(filename, 'w') as file:
+        # Create a group for VsdiSession
+        session_group = file.create_group('VsdiSession')
+        
+        # Save metadata
+        metadata_group = session_group.create_group('metadata')
+        for key, value in vsdi_session.metadata.items():
+            metadata_group[key] = value
+        
+        # Save arrays using datasets
+        session_group.create_dataset('vsdi_video', data=vsdi_session.vsdi_video)
+        session_group.create_dataset('vsdi_time', data=vsdi_session.vsdi_time)
+        session_group.create_dataset('vsdi_mask', data=vsdi_session.vsdi_mask)
+        
+        # Save VR data
+        vr_data_group = session_group.create_group('vr_data')
+        for key, value in vsdi_session.vr_data.items():
+            vr_data_group[key] = value
+        
+        # Save LFP data
+        lfp_group = session_group.create_group('lfp')
+        for key, value in vsdi_session.lfp.items():
+            lfp_group[key] = value
+
+def load_vsdi_session(filename):
+    with h5py.File(filename, 'r') as file:
+        session_group = file['VsdiSession']
+        
+        metadata = dict(session_group['metadata'])
+        vsdi_video = session_group['vsdi_video'][:]
+        vsdi_time = session_group['vsdi_time'][:]
+        vsdi_mask = session_group['vsdi_mask'][:]
+        
+        vr_data = dict(session_group['vr_data'])
+        lfp = dict(session_group['lfp'])
+        
+        vsdi_session = VsdiSession(metadata, vsdi_video, vsdi_time, vsdi_mask, vr_data, lfp)
+        return vsdi_session
+
 
 
 class DataLoader:
