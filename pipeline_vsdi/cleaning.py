@@ -1,4 +1,5 @@
 import numpy as np
+from scipy import stats
 
 
 def normalize_vsdi(vsdi, mask):
@@ -6,14 +7,17 @@ def normalize_vsdi(vsdi, mask):
     v_t = vsdi.transpose(2, 0, 1)
     # Mask vsdi
     v_masked = v_t * mask
-    v_reshaped = v_masked.reshape(v_masked.shape[0], v_masked.shape[1]*v_masked.shape[2])
+    v_reshaped = v_masked.reshape(
+        v_masked.shape[0], v_masked.shape[1]*v_masked.shape[2])
     # Normalize usign Standard Scaler
     v_norm = StandardScaler().fit_transform(v_reshaped)
-    v_norm_reshaped = v_norm.reshape(v_masked.shape[0], v_masked.shape[1], v_masked.shape[2])
+    v_norm_reshaped = v_norm.reshape(
+        v_masked.shape[0], v_masked.shape[1], v_masked.shape[2])
     # Transpose to this shape (x, y, time)
     v_norm_original = v_norm_reshaped.transpose(1, 2, 0)
-    
+
     return v_norm_original
+
 
 def find_outliers(vsdi, nsigma=3):
     """
@@ -35,7 +39,7 @@ def find_outliers(vsdi, nsigma=3):
     # How many standard deviations away a value is from the mean
     zscore = stats.zscore(mean_vsdi, axis=0, ddof=0, nan_policy='propagate')
     # zscore = StandardScaler().fit_transform(vsdi)
-    
+
     # Get index of outliers from vsdi presenting average activity higher than 4 sigma
     outliers = np.argwhere((zscore > nsigma) | (zscore < -nsigma)).ravel()
 
@@ -80,10 +84,13 @@ def clean_outliers(vsdi, nsigma=3):
         start = outliers_subsets[i][0]
         end = outliers_subsets[i][1]
         if start == 0:
-            vsdi[:, :, start:end+1] = np.tile(vsdi[:, :, end+1][:, :, np.newaxis], (1, 1, end - start + 1))
+            vsdi[:, :, start:end+1] = np.tile(vsdi[:, :, end+1]
+                                              [:, :, np.newaxis], (1, 1, end - start + 1))
         elif end == vsdi.shape[2]-1:
-            vsdi[:, :, start:end+1] = np.tile(vsdi[:, :, start-1][:, :, np.newaxis], (1, 1, end - start + 1))
+            vsdi[:, :, start:end+1] = np.tile(vsdi[:, :, start-1]
+                                              [:, :, np.newaxis], (1, 1, end - start + 1))
         else:
-            average = np.divide(np.add(vsdi[:, :, (start-1)][:, :, np.newaxis], vsdi[:, :, (end+1)][:, :, np.newaxis]), 2)
+            average = np.divide(np.add(
+                vsdi[:, :, (start-1)][:, :, np.newaxis], vsdi[:, :, (end+1)][:, :, np.newaxis]), 2)
             vsdi[:, :, start:end+1] = average
     return vsdi

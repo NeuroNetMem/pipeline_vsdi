@@ -50,7 +50,7 @@ class Conv_AE(nn.Module):
         )
 
         # Linear layer for mean and variance
-        self.fc = nn.Linear(64 * 84 * 48, self.latent_dim)
+        self.fc = nn.Linear(64 * h * 48, self.latent_dim)
 
         # Decoder
         self.decoder = nn.Sequential(
@@ -188,7 +188,7 @@ def train_autoencoder(model, train_loader, dataset=[], num_epochs=1000, learning
         model.parameters(), lr=learning_rate, weight_decay=L2_weight_decay)
     criterion = nn.MSELoss()
 
-    model = model.to('cuda')
+    #model = model.to('cuda')
 
     history = []
     embeddings = []
@@ -199,7 +199,7 @@ def train_autoencoder(model, train_loader, dataset=[], num_epochs=1000, learning
         with tqdm(total=len(train_loader)) as pbar:
             for i, data in enumerate(train_loader, 0):
                 inputs, _ = data
-                inputs = inputs.to('cuda')
+                #inputs = inputs.to('cuda')
 
                 loss = model.backward(
                     optimizer=optimizer, criterion=criterion, x=inputs, y_true=inputs)
@@ -264,7 +264,8 @@ def get_latent_vectors(dataset, model, batch_size=128):
     with torch.no_grad():
         for batch in data_loader:
             inputs, _ = batch
-            latent = model(inputs.to('cuda'))[1]
+            latent = model(inputs)[1]
+            #latent = model(inputs.to('cuda'))[1]
             latent_vectors.append(latent.cpu().numpy())
     latent_vectors = np.concatenate(latent_vectors)
     return latent_vectors
